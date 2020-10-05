@@ -1,0 +1,41 @@
+<html>
+
+<head>
+	<title>
+		WebGL hello world demo
+	</title>
+</head>
+
+<body>
+
+	<style>
+		body {
+			margin: 0;
+		}
+	</style>
+
+	<canvas id='main-canvas'>
+		Sorry, your browser does not support this demo
+	</canvas>
+
+	<script src='main.js'></script>
+
+	<script type='x-shader/x-vertex' id='vshader'>
+		void main() {
+			gl_Position = vec4(0,0,0,1);
+			gl_PointSize = 16.0;
+		}
+	</script>
+
+
+	<script type='x-shader/x-fragment' id='fshader'>
+		void main() {
+			gl_FragColor = vec4(1,0,0,1);
+		}
+	</script>
+
+	<script src='init.js'></script>
+
+</body>
+
+</html>
