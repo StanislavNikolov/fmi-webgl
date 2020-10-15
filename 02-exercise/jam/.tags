@@ -1,0 +1,21 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	0.0.0	//
+FLOAT_SIZE	init.js	/^const FLOAT_SIZE = Float32Array.BYTES_PER_ELEMENT;$/;"	C
+aRGB	main.js	/^	const aRGB = gl.getAttribLocation(shaderProgram, 'aRGB');$/;"	C
+aXY	main.js	/^	const aXY = gl.getAttribLocation(shaderProgram, 'aXY');$/;"	C
+addTriangle	main.js	/^const addTriangle = (x1, y1, x2, y2, x3, y3, r, g, b) => {$/;"	C
+buf	main.js	/^	const buf = gl.createBuffer();$/;"	C
+canvas	init.js	/^const canvas = document.getElementById('main-canvas');$/;"	C
+data	main.js	/^const data = [$/;"	C
+fShader	init.js	/^const fShader = gl.createShader(gl.FRAGMENT_SHADER);$/;"	C
+gl	init.js	/^const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');$/;"	C
+render	main.js	/^const render = () => {$/;"	C
+resize	init.js	/^const resize = () => {$/;"	C
+setup	main.js	/^const setup = () => {$/;"	C
+shaderProgram	init.js	/^const shaderProgram = gl.createProgram();$/;"	C
+vShader	init.js	/^const vShader = gl.createShader(gl.VERTEX_SHADER);$/;"	C
