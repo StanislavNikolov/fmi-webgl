@@ -1,0 +1,77 @@
+<html>
+
+<head>
+	<title>
+		WebGL hello world demo
+	</title>
+</head>
+
+<body>
+
+	<style>
+		body {
+			margin: 0;
+		}
+	</style>
+
+	<canvas id='main-canvas'>
+		Sorry, your browser does not support this demo
+	</canvas>
+
+	<script src='main.js'></script>
+
+	<script type='x-shader/x-vertex' id='vshader'>
+		uniform int uFrame;
+		uniform vec2 uAspect;
+		attribute float aI;
+		varying float vI;
+
+		const float PI = 3.1415;
+
+		void main() {
+			float frame = float(uFrame);
+
+			int count = 9;
+			float f = 1.0 / float(count); // frequency
+
+			/// saw (0 to f)
+			float saw = mod(aI, f);
+
+			/// microsaw (0 to f/2)
+			// step 1 - is it in second half? mul is -1 if yes, 1 otherwise
+			bool secondHalf = (saw - (f / 2.0)) >= 0.0;
+			float mul = float(secondHalf) * (-2.0) + 1.0;
+			// step 2 - invert half of the saw
+			float microsaw = mod(saw, f / 2.0) * mul + float(secondHalf) * f / 2.0;
+
+			/// cut off saw
+			float cutOfSaw = clamp(microsaw, 0.25 * (f/2.0), 0.75 * (f/2.0));
+
+			float lenOffset = smoothstep(0.25 * (f/2.0), 0.75 * (f/2.0), cutOfSaw);
+
+			float angle = aI * 2.0 * PI;
+			vec2 original = vec2(cos(angle), sin(angle)) * (0.6 + lenOffset / 4.0);
+			//vec2 original = vec2(aI - 1.0, lenOffset);
+
+			gl_Position = vec4(original * uAspect,0,1);
+			gl_PointSize = 16.0;
+
+			//vI = float(secondHalf);
+		}
+	</script>
+
+
+	<script type='x-shader/x-fragment' id='fshader'>
+		precision mediump float;
+		varying float vI;
+
+		void main() {
+			gl_FragColor = vec4(vI, 0, vI, 1);
+		}
+	</script>
+
+	<script src='init.js'></script>
+
+</body>
+
+</html>

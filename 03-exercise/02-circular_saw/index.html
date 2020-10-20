@@ -1,0 +1,63 @@
+<html>
+
+<head>
+	<title>
+		WebGL hello world demo
+	</title>
+</head>
+
+<body>
+
+	<style>
+		body {
+			margin: 0;
+		}
+	</style>
+
+	<canvas id='main-canvas'>
+		Sorry, your browser does not support this demo
+	</canvas>
+
+	<script src='main.js'></script>
+
+	<script type='x-shader/x-vertex' id='vshader'>
+		uniform int uFrame;
+		uniform vec2 uAspect;
+		attribute float aI;
+		varying float vI;
+
+		const float PI = 3.1415;
+
+		void main() {
+			float frame = float(uFrame);
+			float angle = mod(aI, 1.0) * 2.0 * PI;
+
+			int count = 23;
+			float frequency = 2.0 * PI / float(count);
+			float lenOffset = mod(angle - frame * 0.03, frequency) * 0.3;
+			float angOffset = mod(angle - frame * 0.03, frequency) * 0.5;
+
+			vec2 original = vec2(cos(angle + angOffset), sin(angle + angOffset)) * (0.5 + lenOffset);
+
+			gl_Position = vec4(original * uAspect,0,1);
+			gl_PointSize = 16.0;
+
+			vI = mod(aI - frame * 0.03, 1.0);
+		}
+	</script>
+
+
+	<script type='x-shader/x-fragment' id='fshader'>
+		precision mediump float;
+		varying float vI;
+
+		void main() {
+			gl_FragColor = vec4(vI, 0, 0, 1);
+		}
+	</script>
+
+	<script src='init.js'></script>
+
+</body>
+
+</html>
