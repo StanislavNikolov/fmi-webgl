@@ -1,0 +1,48 @@
+<html>
+
+<head>
+	<title>
+		82245 - WebGL Cherga Homework
+	</title>
+</head>
+
+<body>
+
+	<style>
+		body {
+			margin: 0;
+		}
+	</style>
+
+	<canvas id='main-canvas'>
+		Sorry, your browser does not support this demo
+	</canvas>
+
+	<script src='main.js'></script>
+
+	<script type='x-shader/x-vertex' id='vshader'>
+		attribute vec2 aXY;
+		attribute vec3 aRGB;
+		varying vec3 vRGB;
+		void main() {
+			gl_Position = vec4(aXY,0,1);
+			gl_PointSize = 6.0;
+			vRGB = aRGB;
+		}
+	</script>
+
+
+	<script type='x-shader/x-fragment' id='fshader'>
+		precision mediump float;
+		varying vec3 vRGB;
+
+		void main() {
+			gl_FragColor = vec4(vRGB,1);
+		}
+	</script>
+
+	<script src='init.js'></script>
+
+</body>
+
+</html>
