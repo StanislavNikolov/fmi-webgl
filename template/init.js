@@ -48,3 +48,5 @@ window.addEventListener('load', () => {
 	setup();
 	resize();
 });
+
+const map = (x, begin, end) => begin + x * (end-begin);
