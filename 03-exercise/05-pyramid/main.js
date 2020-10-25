@@ -9,7 +9,7 @@ const setup = () => {
 	const a = 1.0 / 2;
 
 	const data = [
-		-a,-a,+a, // (0)  предна стена
+		-a,-a,+a, // (0)  // предна стена
 		+a,-a,+a, // (1)
 		+a,+a,+a, // (2)
 		-a,+a,+a, // (3)
@@ -19,17 +19,36 @@ const setup = () => {
 		+a,+a,-a, // (6)
 		-a,+a,-a, // (7)
 
-		-a,-a,+a, // (0)
+		-a,-a,+a, // (0) // леви ръбове
 		-a,-a,-a, // (4)
 		-a,+a,+a, // (3)
 		-a,+a,-a, // (7)
 
-		+a,-a,+a, // (1)
+		+a,-a,+a, // (1) // десни ръбове
 		+a,-a,-a, // (5)
 		+a,+a,+a, // (2)
 		+a,+a,-a, // (6)
-
 	];
+	/*
+	var data = [ 150,-150,-700,	// предна стена
+			 150,150,-700,
+			-150,150,-700,
+			-150,-150,-700,
+			 150,-150,-1000, // задна стена
+			 150,150,-1000,
+			-150,150,-1000,
+			-150,-150,-1000,
+			
+			 150,-150,-700, // десни хоризонтални ръбове
+			 150,-150,-1000,
+			 150,150,-700,
+			 150,150,-1000,
+			-150,150,-700,	// леви хоризонтални ръбове
+			-150,150,-1000,
+			-150,-150,-700,
+			-150,-150,-1000	];
+			*/
+
 
 	var buf = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER,buf);
@@ -49,29 +68,40 @@ const render = () => {
 	gl.clearColor(1, 1, 0, 1);
 	gl.clear(gl.COLOR_BUFFER_BIT);
 
-	const mat = new Matrix4();
 	const projModelLoc = gl.getUniformLocation(shaderProgram, 'uModelMatrix');
 
-	const cube = () => {
+	const cube = mat => {
 		gl.uniformMatrix4fv(projModelLoc, false, new Float32Array(mat.data));
-		gl.drawArrays(gl.LINE_LOOP,0,4); // предна стена
-		gl.drawArrays(gl.LINE_LOOP,4,4); // задна стена
-		gl.drawArrays(gl.LINES,8,8); // околни ръбове между тях
+		gl.drawArrays(gl.LINE_LOOP, 0, 4); // предна стена
+		gl.drawArrays(gl.LINE_LOOP, 4, 4); // задна стена
+		gl.drawArrays(gl.LINES,     8, 8); // околни ръбове между тях
+		console.log('cube drawn');
 	}
 
-	//mat.scale(200, 200, 200);
-	console.log('asd');
-	mat.scale(200, 200, 200);
+	// WORKS!!
+	//const mat = new Matrix4();
+	//mat.translatei(5, 5, -30);
+
+	for(let i = 0;i < 10;i ++) {
+	const mat = new Matrix4();
+		mat.scalei(i, 2, i);
+		mat.translatei(0, -i, -30);
+		cube(mat);
+		mat.translatei(0, i, 30);
+		mat.scalei(1/i, 1/2, 1/i);
+		console.log(mat.sub(new Matrix4()).only0());
+	}
+
+
+	//mat.scalei(2, 2, 4);
+	/*
 	mat.translate(
 		map(Math.random(), -500, 500),
 		map(Math.random(), -500, 500),
-		map(Math.random(), -500, 500)
+		map(Math.random(), -500, 0)
 	);
-	//console.log(mat)
-	//for(let i = 0;i < 1000;i ++) {
-		//mat.translate(0, 0, -100);
-		//mat.scale(1.5, 1.5, 1.5);
-		cube();
-	//}
-	window.requestAnimationFrame(render);
+	*/
+
+	//console.log('asd');
+	//window.requestAnimationFrame(render);
 };

@@ -1,21 +1,58 @@
 class Matrix4 {
-	constructor() {
+	constructor(data) {
 		// column by column, identity matrix
-		//           aaaaaaa | bbbbbbb | ccccccc | ddddddd
-		this.data = [1,0,0,0 , 0,1,0,0 , 0,0,1,0 , 0,0,0,1];
+		//                   aaaaaaa | bbbbbbb | ccccccc | ddddddd
+		this.data = data || [1,0,0,0 , 0,1,0,0 , 0,0,1,0 , 0,0,0,1];
 	};
 
-	translate(x, y, z) {
-		this.data[12] += this.data[0]*x + this.data[4]*y + this.data[8]*z;
-		this.data[13] += this.data[1]*x + this.data[5]*y + this.data[9]*z;
-		this.data[14] += this.data[2]*x + this.data[6]*y + this.data[10]*z;
+	translatei(x, y, z) {
+		this.data[0] += this.data[3] * x;
+		this.data[4] += this.data[7] * x;
+		this.data[8] += this.data[11]* x;
+		this.data[12]+= this.data[15]* x;
+		this.data[1] += this.data[3] * y;
+		this.data[5] += this.data[7] * y;
+		this.data[9] += this.data[11]* y;
+		this.data[13]+= this.data[15]* y;
+		this.data[2] += this.data[3] * z;
+		this.data[6] += this.data[7] * z;
+		this.data[10]+= this.data[11]* z;
+		this.data[14]+= this.data[15]* z;
 	};
 
-	scale(x, y, z) {
-		this.data[0] *= x; this.data[1] *= x; this.data[2] *= x;
-		this.data[4] *= y; this.data[5] *= y; this.data[6] *= y;
-		this.data[8] *= z; this.data[9] *= z; this.data[10] *= z;
+	scalei(x, y, z) {
+		this.data[0] *= x;
+		this.data[4] *= x;
+		this.data[8] *= x;
+		this.data[12] *= x;
+		this.data[1] *= y;
+		this.data[5] *= y;
+		this.data[9] *= y;
+		this.data[13] *= y;
+		this.data[2] *= z;
+		this.data[6] *= z;
+		this.data[10]*= z;
+		this.data[14] *= z;
 	};
+
+	sub(other) {
+		let arr = [];
+		for(let i = 0;i < 16;i ++) arr[i] = this.data[i] - other.data[i];
+		return new Matrix4(arr);
+	}
+
+	add(other) {
+		let arr = [];
+		for(let i = 0;i < 16;i ++) arr[i] = this.data[i] + other.data[i];
+		return new Matrix4(arr);
+	}
+
+	only0() {
+		for(let i = 0;i < 16;i ++) {
+			if(Math.abs(this.data[i]) > 0.000001) return false;
+		}
+		return true;
+	}
 };
 
 class PerspectiveMatrix extends Matrix4 {
@@ -33,3 +70,22 @@ class PerspectiveMatrix extends Matrix4 {
 		];
 	}
 };
+
+const test = () => {
+	console.log('starting tests');
+
+	const a = new Matrix4();
+	a.scalei(1, 1, 1);
+	console.log(a.sub(new Matrix4()).only0());
+
+	const b = new Matrix4();
+	b.scalei(2, 2, 2);
+	b.translatei(10, 12, -45);
+	b.translatei(-10, -12, 45);
+	b.scalei(1/2, 1/2, 1/2);
+	console.log(b.sub(new Matrix4()).only0());
+
+	console.log('tests finished. you should see only true');
+};
+
+test();
