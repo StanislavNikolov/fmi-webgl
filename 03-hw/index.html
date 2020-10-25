@@ -1,0 +1,63 @@
+<html>
+
+<head>
+	<title>
+		WebGL hello world demo
+	</title>
+	 <meta charset="utf-8"/>
+</head>
+
+<body>
+
+	<style>
+		body {
+			margin: 0;
+		}
+		#tooltips {
+			position: fixed;
+			top: 0;
+		}
+	</style>
+
+	<canvas id='main-canvas'>
+		Sorry, your browser does not support this demo
+	</canvas>
+	<div id="tooltips">
+		Camera mode:
+		<button id='top-down'>Top-down</button>
+		<button id='sideways'>Sideways</button>
+		<button id='animated'>Animated</button>
+		<br>
+		<div id="instructions">
+			Loading...
+		</div>
+	</div>
+
+ 	<script src='matricies.js'></script>
+	<script src='main.js'></script>
+
+	<script type='x-shader/x-vertex' id='vshader'>
+		uniform mat4 uProjMatrix;
+		uniform mat4 uViewMatrix;
+		uniform mat4 uModelMatrix;
+		attribute vec3 aPosition;
+
+		void main() {
+			gl_Position = uProjMatrix * uViewMatrix * uModelMatrix * vec4(aPosition, 1.0);
+			gl_PointSize = 16.0;
+		}
+
+	</script>
+
+
+	<script type='x-shader/x-fragment' id='fshader'>
+		void main() {
+			gl_FragColor = vec4(1,0,0,1);
+		}
+	</script>
+
+	<script src='init.js'></script>
+
+</body>
+
+</html>
