@@ -1,50 +1,19 @@
 <html>
+	<head>
+		<title> WebGL template </title>
+		 <meta charset="utf-8"/>
+	</head>
 
-<head>
-	<title>
-		WebGL hello world demo
-	</title>
-	 <meta charset="utf-8"/>
-</head>
+	<body>
+		<style>
+			body {
+				margin: 0;
+			}
+		</style>
 
-<body>
-
-	<style>
-		body {
-			margin: 0;
-		}
-	</style>
-
-	<canvas id='main-canvas'>
-		Sorry, your browser does not support this demo
-	</canvas>
-
- 	<script src='matricies.js'></script>
-	<script src='main.js'></script>
-
-	<script type='x-shader/x-vertex' id='vshader'>
-		uniform mat4 uProjMatrix;
-		uniform mat4 uViewMatrix;
-		uniform mat4 uModelMatrix;
-		attribute vec3 aXYZ;
-
-		void main() {
-			gl_Position = uProjMatrix * uViewMatrix * uModelMatrix * vec4(aXYZ, 1.0);
-			gl_PointSize = 16.0;
-		}
-	</script>
-
-
-	<script type='x-shader/x-fragment' id='fshader'>
-		precision mediump float;
-		uniform vec3 uColor;
-		void main() {
-			gl_FragColor = vec4(uColor, 1);
-		}
-	</script>
-
-	<script src='init.js'></script>
-
-</body>
-
+		<canvas id='main-canvas'> Sorry, your browser does not support this demo </canvas>
+		<script src='matricies.js'></script>
+		<script src='main.js'></script>
+		<script src='init.js'></script>
+	</body>
 </html>

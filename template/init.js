@@ -7,24 +7,33 @@ if(gl == null) {
 	console.error("Couldn't load WebGL");
 }
 
-// load & compile vertex shader
-const vShader = gl.createShader(gl.VERTEX_SHADER);
-gl.shaderSource(vShader, document.getElementById('vshader').innerText);
+const fetchSource = function(fname) {                                                   
+	let oReq = new XMLHttpRequest();
+	let resp = '';
+	const reqListener = function() { resp = this.responseText; }
+	oReq.addEventListener("load", reqListener);
+	oReq.open("GET", fname, false);
+	oReq.send();
+	return resp;
+}
+
+// load & compile vertex shader                                                         
+const vShader = gl.createShader(gl.VERTEX_SHADER);                                      
+gl.shaderSource(vShader, fetchSource('vert.glsl'));                                     
 gl.compileShader(vShader);
 if(!gl.getShaderParameter(vShader, gl.COMPILE_STATUS)) {
-	console.log(gl.getShaderInfoLog(vShader));
-	console.error("Couldn't compile vertex shader");
+        console.log(gl.getShaderInfoLog(vShader));
+        console.error("Couldn't compile vertex shader");
 }
 
 // load & compile fragment shader
 const fShader = gl.createShader(gl.FRAGMENT_SHADER);
-gl.shaderSource(fShader, document.getElementById('fshader').innerText);
+gl.shaderSource(fShader, fetchSource('frag.glsl'));
 gl.compileShader(fShader);
 if(!gl.getShaderParameter(fShader, gl.COMPILE_STATUS)) {
-	console.log(gl.getShaderInfoLog(fShader));
-	console.error("Couldn't compile fragment shader");
+        console.log(gl.getShaderInfoLog(fShader));
+        console.error("Couldn't compile fragment shader");
 }
-
 // link together
 const shaderProgram = gl.createProgram();
 gl.attachShader(shaderProgram, vShader);
@@ -58,3 +67,7 @@ window.addEventListener('load', () => {
 });
 
 const map = (x, begin, end) => begin + x * (end-begin);
+
+let isKeyPressed = [];
+window.addEventListener('keydown', ev => isKeyPressed[ev.keyCode] = true);
+window.addEventListener('keyup',   ev => isKeyPressed[ev.keyCode] = false);

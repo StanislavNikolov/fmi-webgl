@@ -7,6 +7,68 @@ class Matrix4 {
 		this.data = data || [1,0,0,0 , 0,1,0,0 , 0,0,1,0 , 0,0,0,1];
 	};
 
+	mul(b) {
+		const outM = new Matrix4();
+		const out = outM.data;
+
+		b = b.data;
+		let a00 = this.data[0],
+			a01 = this.data[1],
+			a02 = this.data[2],
+			a03 = this.data[3];
+		let a10 = this.data[4],
+			a11 = this.data[5],
+			a12 = this.data[6],
+			a13 = this.data[7];
+		let a20 = this.data[8],
+			a21 = this.data[9],
+			a22 = this.data[10],
+			a23 = this.data[11];
+		let a30 = this.data[12],
+			a31 = this.data[13],
+			a32 = this.data[14],
+			a33 = this.data[15];
+
+		// Cache only the current line of the second matrix
+		let b0 = b[0],
+			b1 = b[1],
+			b2 = b[2],
+			b3 = b[3];
+		out[0] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+		out[1] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+		out[2] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+		out[3] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+
+		b0 = b[4];
+		b1 = b[5];
+		b2 = b[6];
+		b3 = b[7];
+		out[4] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+		out[5] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+		out[6] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+		out[7] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+
+		b0 = b[8];
+		b1 = b[9];
+		b2 = b[10];
+		b3 = b[11];
+		out[8] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+		out[9] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+		out[10] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+		out[11] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+
+		b0 = b[12];
+		b1 = b[13];
+		b2 = b[14];
+		b3 = b[15];
+		out[12] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+		out[13] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+		out[14] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+		out[15] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+
+		return outM;
+	}
+
 	translatei(x, y, z) {
 		this.data[0] += this.data[3] * x;
 		this.data[4] += this.data[7] * x;
@@ -37,8 +99,7 @@ class Matrix4 {
 		this.data[14]*= z;
 	};
 
-	rotatei(angle, x, y, z)
-	{
+	rotatei(angle, x, y, z) {
 		const c = Math.cos(angle * DEG2RAD);
 		const s = Math.sin(angle * DEG2RAD);
 		const c1 = 1 - c;
@@ -72,8 +133,7 @@ class Matrix4 {
 		this.data[14]= r2 * m12+ r6 * m13+ r10* m14;
 	}
 
-	rotateXi(angle)
-	{
+	rotateXi(angle) {
 		const c = Math.cos(angle * DEG2RAD);
 		const s = Math.sin(angle * DEG2RAD);
 		const m1 = this.data[1],  m2 = this.data[2],
@@ -91,8 +151,7 @@ class Matrix4 {
 		this.data[14]= m13* s + m14* c;
 	}
 
-	rotateYi(angle)
-	{
+	rotateYi(angle) {
 		const c = Math.cos(angle * DEG2RAD);
 		const s = Math.sin(angle * DEG2RAD);
 		const m0 = this.data[0],  m2 = this.data[2],
@@ -110,8 +169,7 @@ class Matrix4 {
 		this.data[14]= m12*-s + m14* c;
 	}
 
-	rotateZi(angle)
-	{
+	rotateZi(angle) {
 		const c = Math.cos(angle * DEG2RAD);
 		const s = Math.sin(angle * DEG2RAD);
 		const m0 = this.data[0],  m1 = this.data[1],
@@ -199,6 +257,7 @@ class PerspectiveMatrix extends Matrix4 {
 	}
 };
 
+
 const test = () => {
 	console.log('starting tests');
 
@@ -212,6 +271,11 @@ const test = () => {
 	b.translatei(-10, -12, 45);
 	b.scalei(1/2, 1/2, 1/2);
 	console.log(b.sub(new Matrix4()).only0());
+
+	const c = new Matrix4([1,0.5,0.1,0.6,    0.2,0.3,0.3,0.9,     3,0.1,0.7,0.1,      0.2,8,0.6,0.1]);
+	const d = new Matrix4([1,5,9,4,           2,6,1,5,              3,7,2,6,              4,8,3,7    ]);
+	const cmuld = new Matrix4([29.8, 34.9, 10.3, 6.4, 7.2, 42.9, 5.699999999999999, 7.2, 11.600000000000001, 51.8, 7.4, 8.899999999999999, 16, 60.7, 9.1, 10.6]);
+	console.log(c.mul(d).sub(cmuld).only0());
 
 	console.log('tests finished. you should see only true');
 };
