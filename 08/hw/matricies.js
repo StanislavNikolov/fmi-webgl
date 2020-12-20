@@ -1,0 +1,282 @@
+const DEG2RAD = Math.PI / 180;
+
+class Matrix4 {
+	constructor(data) {
+		// column by column, identity matrix
+		//                   aaaaaaa | bbbbbbb | ccccccc | ddddddd
+		this.data = data || [1,0,0,0 , 0,1,0,0 , 0,0,1,0 , 0,0,0,1];
+	};
+
+	mul(b) {
+		const outM = new Matrix4();
+		const out = outM.data;
+
+		b = b.data;
+		let a00 = this.data[0],
+			a01 = this.data[1],
+			a02 = this.data[2],
+			a03 = this.data[3];
+		let a10 = this.data[4],
+			a11 = this.data[5],
+			a12 = this.data[6],
+			a13 = this.data[7];
+		let a20 = this.data[8],
+			a21 = this.data[9],
+			a22 = this.data[10],
+			a23 = this.data[11];
+		let a30 = this.data[12],
+			a31 = this.data[13],
+			a32 = this.data[14],
+			a33 = this.data[15];
+
+		// Cache only the current line of the second matrix
+		let b0 = b[0],
+			b1 = b[1],
+			b2 = b[2],
+			b3 = b[3];
+		out[0] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+		out[1] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+		out[2] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+		out[3] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+
+		b0 = b[4];
+		b1 = b[5];
+		b2 = b[6];
+		b3 = b[7];
+		out[4] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+		out[5] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+		out[6] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+		out[7] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+
+		b0 = b[8];
+		b1 = b[9];
+		b2 = b[10];
+		b3 = b[11];
+		out[8] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+		out[9] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+		out[10] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+		out[11] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+
+		b0 = b[12];
+		b1 = b[13];
+		b2 = b[14];
+		b3 = b[15];
+		out[12] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+		out[13] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+		out[14] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+		out[15] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+
+		return outM;
+	}
+
+	translatei(x, y, z) {
+		this.data[0] += this.data[3] * x;
+		this.data[4] += this.data[7] * x;
+		this.data[8] += this.data[11]* x;
+		this.data[12]+= this.data[15]* x;
+		this.data[1] += this.data[3] * y;
+		this.data[5] += this.data[7] * y;
+		this.data[9] += this.data[11]* y;
+		this.data[13]+= this.data[15]* y;
+		this.data[2] += this.data[3] * z;
+		this.data[6] += this.data[7] * z;
+		this.data[10]+= this.data[11]* z;
+		this.data[14]+= this.data[15]* z;
+	};
+
+	scalei(x, y, z) {
+		this.data[0] *= x;
+		this.data[4] *= x;
+		this.data[8] *= x;
+		this.data[12]*= x;
+		this.data[1] *= y;
+		this.data[5] *= y;
+		this.data[9] *= y;
+		this.data[13]*= y;
+		this.data[2] *= z;
+		this.data[6] *= z;
+		this.data[10]*= z;
+		this.data[14]*= z;
+	};
+
+	rotatei(angle, x, y, z) {
+		const c = Math.cos(angle * DEG2RAD);
+		const s = Math.sin(angle * DEG2RAD);
+		const c1 = 1 - c;
+		const m0 = this.data[0],  m4 = this.data[4],  m8 = this.data[8],  m12= this.data[12],
+		      m1 = this.data[1],  m5 = this.data[5],  m9 = this.data[9],  m13= this.data[13],
+		      m2 = this.data[2],  m6 = this.data[6],  m10= this.data[10], m14= this.data[14];
+
+		// build rotation matrix
+		const r0 = x * x * c1 + c;
+		const r1 = x * y * c1 + z * s;
+		const r2 = x * z * c1 - y * s;
+		const r4 = x * y * c1 - z * s;
+		const r5 = y * y * c1 + c;
+		const r6 = y * z * c1 + x * s;
+		const r8 = x * z * c1 + y * s;
+		const r9 = y * z * c1 - x * s;
+		const r10= z * z * c1 + c;
+
+		// multiply rotation matrix
+		this.data[0] = r0 * m0 + r4 * m1 + r8 * m2;
+		this.data[1] = r1 * m0 + r5 * m1 + r9 * m2;
+		this.data[2] = r2 * m0 + r6 * m1 + r10* m2;
+		this.data[4] = r0 * m4 + r4 * m5 + r8 * m6;
+		this.data[5] = r1 * m4 + r5 * m5 + r9 * m6;
+		this.data[6] = r2 * m4 + r6 * m5 + r10* m6;
+		this.data[8] = r0 * m8 + r4 * m9 + r8 * m10;
+		this.data[9] = r1 * m8 + r5 * m9 + r9 * m10;
+		this.data[10]= r2 * m8 + r6 * m9 + r10* m10;
+		this.data[12]= r0 * m12+ r4 * m13+ r8 * m14;
+		this.data[13]= r1 * m12+ r5 * m13+ r9 * m14;
+		this.data[14]= r2 * m12+ r6 * m13+ r10* m14;
+	}
+
+	rotateXi(angle) {
+		const c = Math.cos(angle * DEG2RAD);
+		const s = Math.sin(angle * DEG2RAD);
+		const m1 = this.data[1],  m2 = this.data[2],
+			m5 = this.data[5],  m6 = this.data[6],
+			m9 = this.data[9],  m10= this.data[10],
+			m13= this.data[13], m14= this.data[14];
+
+		this.data[1] = m1 * c + m2 *-s;
+		this.data[2] = m1 * s + m2 * c;
+		this.data[5] = m5 * c + m6 *-s;
+		this.data[6] = m5 * s + m6 * c;
+		this.data[9] = m9 * c + m10*-s;
+		this.data[10]= m9 * s + m10* c;
+		this.data[13]= m13* c + m14*-s;
+		this.data[14]= m13* s + m14* c;
+	}
+
+	rotateYi(angle) {
+		const c = Math.cos(angle * DEG2RAD);
+		const s = Math.sin(angle * DEG2RAD);
+		const m0 = this.data[0],  m2 = this.data[2],
+		      m4 = this.data[4],  m6 = this.data[6],
+		      m8 = this.data[8],  m10= this.data[10],
+		      m12= this.data[12], m14= this.data[14];
+
+		this.data[0] = m0 * c + m2 * s;
+		this.data[2] = m0 *-s + m2 * c;
+		this.data[4] = m4 * c + m6 * s;
+		this.data[6] = m4 *-s + m6 * c;
+		this.data[8] = m8 * c + m10* s;
+		this.data[10]= m8 *-s + m10* c;
+		this.data[12]= m12* c + m14* s;
+		this.data[14]= m12*-s + m14* c;
+	}
+
+	rotateZi(angle) {
+		const c = Math.cos(angle * DEG2RAD);
+		const s = Math.sin(angle * DEG2RAD);
+		const m0 = this.data[0],  m1 = this.data[1],
+		      m4 = this.data[4],  m5 = this.data[5],
+		      m8 = this.data[8],  m9 = this.data[9],
+		      m12= this.data[12], m13= this.data[13];
+
+		this.data[0] = m0 * c + m1 *-s;
+		this.data[1] = m0 * s + m1 * c;
+		this.data[4] = m4 * c + m5 *-s;
+		this.data[5] = m4 * s + m5 * c;
+		this.data[8] = m8 * c + m9 *-s;
+		this.data[9] = m8 * s + m9 * c;
+		this.data[12]= m12* c + m13*-s;
+		this.data[13]= m12* s + m13* c;
+	}
+
+	sub(other) {
+		let arr = [];
+		for(let i = 0;i < 16;i ++) arr[i] = this.data[i] - other.data[i];
+		return new Matrix4(arr);
+	}
+
+	add(other) {
+		let arr = [];
+		for(let i = 0;i < 16;i ++) arr[i] = this.data[i] + other.data[i];
+		return new Matrix4(arr);
+	}
+
+	only0() {
+		for(let i = 0;i < 16;i ++) {
+			if(Math.abs(this.data[i]) > 0.000001) return false;
+		}
+		return true;
+	}
+};
+
+// TODO rewrite
+function unitVector(x)
+{ var len = 1/Math.sqrt( x[0]*x[0]+x[1]*x[1]+x[2]*x[2] );
+  return [ len*x[0], len*x[1], len*x[2] ];
+}
+
+function vectorPoints(x,y)
+{ return [ x[0]-y[0], x[1]-y[1], x[2]-y[2] ]; }
+
+function scalarProduct(x,y)
+{ 	return x[0]*y[0] + x[1]*y[1] + x[2]*y[2]; }
+
+function vectorProduct(x,y)
+{	return [
+			x[1]*y[2]-x[2]*y[1],
+			x[2]*y[0]-x[0]*y[2],
+			x[0]*y[1]-x[1]*y[0] ];
+}
+
+function viewMatrix (eye, focus, up)
+{
+	var z = unitVector(vectorPoints(eye,focus));
+	var x = unitVector(vectorProduct(up,z));
+	var y = unitVector(vectorProduct(z,x));
+	var matrix = [
+		x[0], y[0], z[0], 0,
+		x[1], y[1], z[1], 0,
+		x[2], y[2], z[2], 0,
+		-scalarProduct(x,eye),
+		-scalarProduct(y,eye),
+		-scalarProduct(z,eye), 1 ];
+	return new Float32Array(matrix);
+};
+
+class PerspectiveMatrix extends Matrix4 {
+	constructor(angle, near, far, aspect) {
+		super();
+
+		angle = angle / 360 * (Math.PI * 2); // convert from deg to rad
+
+		const ctg = 1 / Math.tan(angle / 2);
+		this.data = [
+			ctg / aspect, 0, 0, 0, // column 0
+			0, ctg, 0, 0, // column 1
+			0, 0, (near+far)/(near-far), -1, // column 2
+			0, 0, 2*near*far/(near-far), 0 // column 3
+		];
+	}
+};
+
+const test = () => {
+	console.log('starting tests');
+
+	const a = new Matrix4();
+	a.scalei(1, 1, 1);
+	console.log(a.sub(new Matrix4()).only0());
+
+	const b = new Matrix4();
+	b.scalei(2, 2, 2);
+	b.translatei(10, 12, -45);
+	b.translatei(-10, -12, 45);
+	b.scalei(1/2, 1/2, 1/2);
+	console.log(b.sub(new Matrix4()).only0());
+
+	const c = new Matrix4([1,0.5,0.1,0.6,    0.2,0.3,0.3,0.9,     3,0.1,0.7,0.1,      0.2,8,0.6,0.1]);
+	const d = new Matrix4([1,5,9,4,           2,6,1,5,              3,7,2,6,              4,8,3,7    ]);
+	const cmuld = new Matrix4([29.8, 34.9, 10.3, 6.4, 7.2, 42.9, 5.699999999999999, 7.2, 11.600000000000001, 51.8, 7.4, 8.899999999999999, 16, 60.7, 9.1, 10.6]);
+	console.log(c.mul(d).sub(cmuld).only0());
+
+	console.log('tests finished. you should see only true');
+};
+
+//test();

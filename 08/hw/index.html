@@ -1,0 +1,68 @@
+<html>
+
+<head>
+	<title>
+		WebGL hello world demo
+	</title>
+	 <meta charset="utf-8"/>
+</head>
+
+<body>
+
+	<style>
+		body {
+			margin: 0;
+		}
+	</style>
+
+	<canvas id='main-canvas'>
+		Sorry, your browser does not support this demo
+	</canvas>
+
+ 	<script src='matricies.js'></script>
+	<script src='main.js'></script>
+
+	<script type='x-shader/x-vertex' id='vshader'>
+		uniform mat4 uProjMatrix;
+		uniform mat4 uViewMatrix;
+		uniform mat4 uAccModelMatrix;
+		uniform mat4 uModelMatrix;
+		uniform vec3 uLightDir;
+
+		attribute vec3 aXYZ;
+		attribute vec3 aNrm;
+		attribute vec3 aColor;
+
+		varying vec3 vColor;
+
+		void main() {
+			const vec3 ambientLight = vec3(0.3, 0.3, 0.3);
+
+			mat4 mm = uAccModelMatrix * uModelMatrix;
+			//gl_Position = uProjMatrix * uViewMatrix * uModelMatrix * vec4(aXYZ, 1.0);
+			gl_Position = uProjMatrix * uViewMatrix * mm * vec4(aXYZ, 1.0);
+
+			vec3 light = normalize(-uLightDir);
+			vec3 normal = vec3(normalize( mm * vec4(aNrm,0) ));
+			vColor = aColor * (vec3(1.0, 1.0, 1.0) * max(dot(normal, light), 0.0) + ambientLight);
+
+			gl_PointSize = 16.0;
+		}
+	</script>
+
+
+	<script type='x-shader/x-fragment' id='fshader'>
+		precision highp float;
+
+		varying vec3 vColor;
+
+		void main() {
+			gl_FragColor = vec4(vColor, 1);
+		}
+	</script>
+
+	<script src='init.js'></script>
+
+</body>
+
+</html>
