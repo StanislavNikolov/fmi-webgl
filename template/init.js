@@ -7,7 +7,7 @@ if(gl == null) {
 	console.error("Couldn't load WebGL");
 }
 
-const fetchSource = function(fname) {                                                   
+const fetchSource = function(fname) {
 	let oReq = new XMLHttpRequest();
 	let resp = '';
 	const reqListener = function() { resp = this.responseText; }
@@ -17,9 +17,9 @@ const fetchSource = function(fname) {
 	return resp;
 }
 
-// load & compile vertex shader                                                         
-const vShader = gl.createShader(gl.VERTEX_SHADER);                                      
-gl.shaderSource(vShader, fetchSource('vert.glsl'));                                     
+// load & compile vertex shader
+const vShader = gl.createShader(gl.VERTEX_SHADER);
+gl.shaderSource(vShader, fetchSource('vert.glsl'));
 gl.compileShader(vShader);
 if(!gl.getShaderParameter(vShader, gl.COMPILE_STATUS)) {
         console.log(gl.getShaderInfoLog(vShader));

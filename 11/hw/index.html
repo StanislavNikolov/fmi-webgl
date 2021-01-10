@@ -1,0 +1,52 @@
+<html>
+	<head>
+		<title> WebGL template </title>
+		 <meta charset="utf-8"/>
+	</head>
+
+	<body>
+		<style>
+			body {
+				margin: 0;
+			}
+			#main-canvas {
+				width: 100%;
+				height: 80%;
+			}
+			#lower-canvas {
+				width: 100%;
+				height: 20%;
+			}
+			#container {
+				width: 100%;
+				height: 100%;
+			}
+			.overlay {
+				position: absolute;
+				bottom: 0;
+				height: 20%;
+				background-color: white;
+				opacity: 0.5;
+				pointer-events: none;
+			}
+			#overlay-left {
+				left: 0;
+				width: 40%;
+			}
+			#overlay-right {
+				right: 0;
+				width: 40%;
+			}
+		</style>
+
+		<span id="container">
+			<canvas id='main-canvas'> Sorry, your browser does not support this demo </canvas>
+			<canvas id='lower-canvas'> </canvas>
+			<div class='overlay' id='overlay-left'></div>
+			<div class='overlay' id='overlay-right'></div>
+		</span>
+		<script src='matricies.js'></script>
+		<script src='main.js'></script>
+		<script src='init.js'></script>
+	</body>
+</html>
