@@ -89,7 +89,7 @@ const setup = (surface) => {
 	surface.cam = new Camera();
 	surface.vars = {};
 
-	const {gl, canvas, vars, cam} = surface;
+	const {gl, vars, cam} = surface;
 
 	vars.uProjMatrix   = gl.getUniformLocation(surface.program, 'uProjMatrix');
 	vars.uViewMatrix   = gl.getUniformLocation(surface.program, 'uViewMatrix');
@@ -137,13 +137,13 @@ const init_level = () => {
 let cubes = init_level();
 
 const render = (surface) => {
-	const {gl, canvas, vars, cam} = surface;
+	const {gl, glcanvas, vars, cam} = surface;
 
 	gl.clearColor(0.9, 0.9, 0.9, 1);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 	// projection
-	const proj = new PerspectiveMatrix(30, 1, 4000, canvas.width/canvas.height);
+	const proj = new PerspectiveMatrix(30, 1, 4000, glcanvas.width/glcanvas.height);
 	gl.uniformMatrix4fv(vars.uProjMatrix, false, new Float32Array(proj.data));
 
 	// camera

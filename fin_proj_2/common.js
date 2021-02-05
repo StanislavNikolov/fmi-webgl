@@ -56,10 +56,14 @@ class Camera {
 }
 
 class Surface {
-	constructor(canvasId, vertFName, fragFName) {
+	constructor(glcanvasId, tcanvasId, vertFName, fragFName, targetImage) {
+		this.tcanvas = document.getElementById(tcanvasId);
+		this.tcontext = this.tcanvas.getContext('2d');
+		this.targetImage = targetImage;
+
 		// get context
-		this.canvas = document.getElementById(canvasId);
-		this.gl = this.canvas.getContext('webgl') || this.canvas.getContext('experimental-webgl');
+		this.glcanvas = document.getElementById(glcanvasId);
+		this.gl = this.glcanvas.getContext('webgl') || this.glcanvas.getContext('experimental-webgl');
 		if(this.gl == null) {
 			console.error("Couldn't load WebGL");
 		}
@@ -98,10 +102,22 @@ class Surface {
 	}
 
 	rescale() {
-		//this.canvas.width  = this.canvas.getBoundingClientRect().width;
-		//this.canvas.height = this.canvas.getBoundingClientRect().height;
-		this.canvas.width  = this.canvas.clientWidth;
-		this.canvas.height = this.canvas.clientHeight;
-		this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+		this.glcanvas.width  = this.glcanvas.clientWidth;
+		this.glcanvas.height = this.glcanvas.clientHeight;
+		this.tcanvas.width  = this.tcanvas.clientWidth;
+		this.tcanvas.height = this.tcanvas.clientHeight;
+		this.gl.viewport(0, 0, this.glcanvas.width, this.glcanvas.height);
+		this.drawTargetImage();
+	}
+
+	drawTargetImage() {
+		const scale = Math.min(this.tcanvas.width, this.tcanvas.height)
+			/ Math.min(this.targetImage.width, this.targetImage.height);
+
+		const dw = this.targetImage.width * scale;
+		const dh = this.targetImage.height * scale;
+		const x = (this.tcanvas.width - dw) / 2;
+		const y = (this.tcanvas.height - dh) / 2;
+		this.tcontext.drawImage(this.targetImage, x, y, dw, dh);
 	}
 }
