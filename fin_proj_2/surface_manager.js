@@ -1,13 +1,11 @@
-let currentFrame = 0;
 const renderWrapper = () => {
+	if(CADStarted) iterateBeforeRender();
 	for(const surf of surfaces) render(surf);
+	if(CADStarted) iterateAfterRender();
 
 	currentFrame += 1;
 	window.requestAnimationFrame(renderWrapper);
 };
-
-let surfaces = [];
-let activeSurface = null;
 
 const addSurface = (targetImage) => {
 	const pair = document.createElement('span');
@@ -22,6 +20,7 @@ const addSurface = (targetImage) => {
 	const scvs = document.createElement('canvas');
 	scvs.classList.add('webgl');
 	scvs.id = Math.random();
+	scvs.style['opacity'] = 0.7;
 	pair.appendChild(scvs);
 
 	const surf = new Surface(scvs.id, tcvs.id, 'vert.glsl', 'frag.glsl', targetImage);
@@ -44,12 +43,23 @@ const addSurface = (targetImage) => {
 	setup(surf);
 }
 
+const changeOpacity = (delta) => {
+	for(const surf of surfaces) {
+		const curr = Number(surf.glcanvas.style['opacity']);
+		let set = curr + delta;
+		if(set < 0) set = 0;
+		if(set > 1) set = 1;
+		surf.glcanvas.style['opacity'] = set;
+	}
+}
+
 window.addEventListener('load', () => {
 	let loadedCounter = 0;
 	const loaded = () => {
 		loadedCounter ++;
 		if(loadedCounter == 4) {
 			for(const surf of surfaces) surf.drawTargetImage();
+			CADStarted = true;
 		}
 	};
 
@@ -81,23 +91,22 @@ window.addEventListener('load', () => {
 		}
 	});
 
-	let isKeyPressed = [];
-	window.addEventListener('keydown', ev => isKeyPressed[ev.keyCode] = true);
-	window.addEventListener('keyup',   ev => isKeyPressed[ev.keyCode] = false);
-
 	setInterval(() => {
-		if(activeSurface == null) return;
-
-		if(isKeyPressed[87]) activeSurface.cam.moveForward(0.1);
-		if(isKeyPressed[83]) activeSurface.cam.moveForward(-0.1);
-		if(isKeyPressed[68]) activeSurface.cam.moveRight(0.1);
-		if(isKeyPressed[65]) activeSurface.cam.moveRight(-0.1);
-
 		/*
 		for(const i in isKeyPressed) {
 			if(isKeyPressed[i]) console.log(i, isKeyPressed[i]);
 		}
 		*/
+
+		if(isKeyPressed[219]) changeOpacity(-0.01);
+		if(isKeyPressed[221]) changeOpacity(0.01);
+
+		if(activeSurface == null) return;
+		if(isKeyPressed[87]) activeSurface.cam.moveForward(0.1);
+		if(isKeyPressed[83]) activeSurface.cam.moveForward(-0.1);
+		if(isKeyPressed[68]) activeSurface.cam.moveRight(0.1);
+		if(isKeyPressed[65]) activeSurface.cam.moveRight(-0.1);
+
 	}, 10);
 
 	window.requestAnimationFrame(renderWrapper);

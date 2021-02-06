@@ -1,3 +1,6 @@
+const r = Math.random;
+const R = (x) => map(r(), -x, x);
+const map = (x, begin, end) => begin + x * (end-begin);
 const FLOAT_SIZE = Float32Array.BYTES_PER_ELEMENT;
 
 const fetchSource = function(fname) {
@@ -34,8 +37,10 @@ class Camera {
 	}
 	rotDY(dy) {
 		this.rotY += dy;
-		if(this.rotY > Math.PI) this.rotY = Math.PI;
-		if(this.rotY < 0.001)   this.rotY = 0.001;
+		const MAX = Math.PI * 0.99;
+		const MIN = Math.PI * 0.01;
+		if(this.rotY > MAX) this.rotY = MAX;
+		if(this.rotY < MIN) this.rotY = MIN;
 		this.calcLookDir();
 	}
 	/*
@@ -55,11 +60,29 @@ class Camera {
 	}
 }
 
+class Rect {
+	constructor(x, y, w, h) {
+		this.x = x;
+		this.y = y;
+		this.w = w;
+		this.h = h;
+	}
+}
+
 class Surface {
 	constructor(glcanvasId, tcanvasId, vertFName, fragFName, targetImage) {
 		this.tcanvas = document.getElementById(tcanvasId);
 		this.tcontext = this.tcanvas.getContext('2d');
 		this.targetImage = targetImage;
+		this.tpixels = null;
+		this.redrawn = true;
+		this.glpixels = null;
+
+		this.compareStarted = false;
+
+		this.compare = new Rect();
+
+		this.cam = new Camera();
 
 		// get context
 		this.glcanvas = document.getElementById(glcanvasId);
@@ -97,8 +120,6 @@ class Surface {
 
 		this.gl.useProgram(this.program);
 		console.log(this.gl.getProgramInfoLog(this.program));
-
-		this.cam = new Camera();
 	}
 
 	rescale() {
@@ -107,7 +128,10 @@ class Surface {
 		this.tcanvas.width  = this.tcanvas.clientWidth;
 		this.tcanvas.height = this.tcanvas.clientHeight;
 		this.gl.viewport(0, 0, this.glcanvas.width, this.glcanvas.height);
-		this.drawTargetImage();
+
+		if(this.compareStarted) {
+			this.drawTargetImage();
+		}
 	}
 
 	drawTargetImage() {
@@ -118,6 +142,31 @@ class Surface {
 		const dh = this.targetImage.height * scale;
 		const x = (this.tcanvas.width - dw) / 2;
 		const y = (this.tcanvas.height - dh) / 2;
+		this.compare = new Rect(x, y, dw, dh);
 		this.tcontext.drawImage(this.targetImage, x, y, dw, dh);
+		this.tpixels = this.tcontext.getImageData(x, y, dw, dh);
+		this.glpixels = new Uint8Array(this.compare.w * this.compare.h * 4);
+	}
+
+	calcScore() {
+		let total = 0;
+		for(let y = 0;y < this.compare.h;y ++) {
+			for(let x = 0;x < this.compare.w;x ++) {
+				const tid = (y * this.compare.w + x) * 4;
+				const t_r = this.tpixels.data[tid+0];
+				const t_g = this.tpixels.data[tid+1];
+				const t_b = this.tpixels.data[tid+2];
+				//if(t_r === 0 && t_g === 0 && t_b === 0) continue;
+
+				// see "IMPORTANT NOTE" in render.js about gl.readPixels
+				const glid = ((this.compare.h-y-1)*this.compare.w + x) * 4;
+				const gl_r = this.glpixels[glid+0];
+				const gl_g = this.glpixels[glid+1];
+				const gl_b = this.glpixels[glid+2];
+
+				total += (t_r-gl_r)*(t_r-gl_r) + (t_g-gl_g)*(t_g-gl_g) + (t_b-gl_b)*(t_b-gl_b);
+			}
+		}
+		return total;
 	}
 }
