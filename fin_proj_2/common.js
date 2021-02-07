@@ -1,6 +1,6 @@
+const map = (x, begin, end) => begin + x * (end-begin);
 const r = Math.random;
 const R = (x) => map(r(), -x, x);
-const map = (x, begin, end) => begin + x * (end-begin);
 const FLOAT_SIZE = Float32Array.BYTES_PER_ELEMENT;
 
 const fetchSource = function(fname) {
@@ -129,7 +129,7 @@ class Surface {
 		this.tcanvas.height = this.tcanvas.clientHeight;
 		this.gl.viewport(0, 0, this.glcanvas.width, this.glcanvas.height);
 
-		if(this.compareStarted) {
+		if(this.targetImage.complete) {
 			this.drawTargetImage();
 		}
 	}
@@ -150,8 +150,8 @@ class Surface {
 
 	calcScore() {
 		let total = 0;
-		for(let y = 0;y < this.compare.h;y += 3) {
-			for(let x = 0;x < this.compare.w;x += 3) {
+		for(let y = 0;y < this.compare.h;y += 2) {
+			for(let x = 0;x < this.compare.w;x += 2) {
 				const tid = (y * this.compare.w + x) * 4;
 				const t_r = this.tpixels.data[tid+0];
 				const t_g = this.tpixels.data[tid+1];

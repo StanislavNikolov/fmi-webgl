@@ -1,8 +1,10 @@
 const renderWrapper = () => {
-	for(let i = 0;i < 10;i ++) {
-		if(CADStarted) iterateBeforeRender();
-		for(const surf of surfaces) render(surf);
-		if(CADStarted) iterateAfterRender();
+	if(CADStarted) {
+		for(let i = 0;i < 5;i ++) {
+			iterateBeforeRender();
+			for(const surf of surfaces) render(surf);
+			iterateAfterRender();
+		}
 	}
 	for(const surf of surfaces) render(surf);
 
@@ -13,7 +15,7 @@ const renderWrapper = () => {
 const addSurface = (targetImage) => {
 	const pair = document.createElement('span');
 	pair.classList.add('pair');
-	document.getElementById('container').appendChild(pair);
+	document.getElementById('surfaces').appendChild(pair);
 
 	const tcvs = document.createElement('canvas');
 	tcvs.classList.add('target');
@@ -23,7 +25,7 @@ const addSurface = (targetImage) => {
 	const scvs = document.createElement('canvas');
 	scvs.classList.add('webgl');
 	scvs.id = Math.random();
-	scvs.style['opacity'] = 0.7;
+	scvs.style['opacity'] = 0.5;
 	pair.appendChild(scvs);
 
 	const surf = new Surface(scvs.id, tcvs.id, 'vert.glsl', 'frag.glsl', targetImage);
@@ -31,46 +33,57 @@ const addSurface = (targetImage) => {
 	surfaces.push(surf);
 
 	surf.glcanvas.addEventListener('click', () => {
+		console.log('click', activeSurface);
 		if(activeSurface != null) return;
 		surf.glcanvas.requestPointerLock();
-	});
-
-	surf.glcanvas.addEventListener('mousemove', (ev) => {
-		if(activeSurface == null || activeSurface !== surf) return;
-
-		surf.cam.rotDX(ev.movementX / 500.0)
-		surf.cam.rotDY(ev.movementY / 500.0);
-		surf.cam.calcLookDir();
 	});
 
 	setup(surf);
 }
 
-const changeOpacity = (delta) => {
+const setOpacity = (opacity) => {
 	for(const surf of surfaces) {
-		const curr = Number(surf.glcanvas.style['opacity']);
-		let set = curr + delta;
-		if(set < 0) set = 0;
-		if(set > 1) set = 1;
-		surf.glcanvas.style['opacity'] = set;
+		surf.glcanvas.style['opacity'] = opacity;
 	}
 }
 
+const setCADState = (state) => {
+	const el = document.getElementById('btn_startpause')
+	if(state) {
+		el.innerText = 'Pause';
+		el.classList.add('red');
+		el.classList.remove('green');
+	} else {
+		el.innerText = 'Start';
+		el.classList.add('green');
+		el.classList.remove('red');
+	}
+	const text = (state === true ? 'Pause' : 'Start');
+	CADStarted = state;
+};
+
 window.addEventListener('load', () => {
+	document.getElementById('overlay').oninput = (ev) => {
+		setOpacity(1-ev.target.value);
+	};
+
 	let loadedCounter = 0;
 	const loaded = () => {
 		loadedCounter ++;
 		if(loadedCounter == 4) {
 			for(const surf of surfaces) surf.drawTargetImage();
-			CADStarted = true;
+			everythingLoaded = true;
+			setCADState(true);
+			document.getElementById('btn_startpause').disabled = false;
+			document.getElementById('btn_startpause').onclick = () => {
+				setCADState(!CADStarted);
+			};
 		}
 	};
 
 	for(let i = 0;i < 4;i ++) {
 		const targetImage = new Image();
-		targetImage.onload = () => {
-			loaded();
-		};
+		targetImage.onload = loaded;
 		targetImage.src = `data/export/monkey_2/${i+1}.png`;
 		addSurface(targetImage);
 	}
@@ -102,6 +115,16 @@ window.addEventListener('load', () => {
 		}
 	});
 
+	document.addEventListener('mousemove', (ev) => {
+		if(activeSurface == null) return;
+		console.log('mouse move');
+
+		activeSurface.cam.rotDX(ev.movementX / 500.0)
+		activeSurface.cam.rotDY(ev.movementY / 500.0);
+		activeSurface.cam.calcLookDir();
+	});
+
+
 	setInterval(() => {
 		/*
 		for(const i in isKeyPressed) {
@@ -109,8 +132,8 @@ window.addEventListener('load', () => {
 		}
 		*/
 
-		if(isKeyPressed[219]) changeOpacity(-0.01);
-		if(isKeyPressed[221]) changeOpacity(0.01);
+		//if(isKeyPressed[219]) changeOpacity(-0.01);
+		//if(isKeyPressed[221]) changeOpacity(0.01);
 
 		if(activeSurface == null) return;
 		if(isKeyPressed[87]) activeSurface.cam.moveForward(0.1);

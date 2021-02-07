@@ -157,7 +157,7 @@ const render = (surface) => {
 	if(!CADStarted) {
 		for(const surf of surfaces) {
 			if(surf === surface) continue;
-			const color = [0.6, 0.6, 0.2];
+			const color = [0.5, 0.5, 0.5];
 			const scale = [0.2, 0.5, 0.2];
 			const rotation = [0, surf.cam.rotX / Math.PI * 180, 0];
 			scene.cubes.push(new Cube(color, scale, rotation, surf.cam.pos));

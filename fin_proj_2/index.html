@@ -19,7 +19,7 @@
 			.pair {
 				position: relative;
 			}
-			#container {
+			#surfaces {
 				display: grid;
 				grid-gap: 5px;
 				grid-template-columns: 1fr 1fr;
@@ -27,9 +27,91 @@
 				width: 100%;
 				height: 100%;
 			}
+			#wrapper {
+				display: flex;
+				flex-direction: row;
+				width: 100%;
+				height: 100%;
+			}
+			#controls {
+				width: 10em;
+				padding: 0.2em;
+			}
+			.bottom {
+				position: absolute;
+				bottom: 0;
+			}
+			.monospace {
+				font-family: monospace;
+			}
+			.uibtn {
+				/*
+				padding-left: 0.5em;
+				padding-right: 0.5em;
+				padding-top: 0.2em;
+				padding-bottom: 0.2em;
+				*/
+				border: none;
+				border-radius: 5px;
+				outline: none;
+				background-color: #efefef;
+			}
+			.uibtn:hover {
+				background-color: #cfcfcf;
+			}
+			#btn_startpause {
+				width: 100%;
+				padding: 0.5em;
+				font-weight: bold;
+			}
+			.uibtn .pref {
+			}
+			.green {
+				color: white;
+				background-color: #21ba45;
+			}
+			.red {
+				color: white;
+				background-color: #db2828;
+			}
 		</style>
 
-		<div id="container"> </div>
+		<span id="wrapper">
+			<span id="controls">
+				<center>
+				<button class="uibtn" id="btn_startpause" disabled> Start </button><br>
+				</center>
+
+				<br><br>
+
+				Preffered mutations:<br>
+				<button class="uibtn" id="pref_def" class='pref' disabled>Default</button>
+				<button class="uibtn" id="pref_add" class='pref'>Add</button>
+				<button class="uibtn" id="pref_rem" class='pref'>Delete</button>
+				<button class="uibtn" id="pref_col" class='pref'>Color</button>
+				<button class="uibtn" id="pref_mov" class='pref'>Move</button>
+				<button class="uibtn" id="pref_scl" class='pref'>Scale</button>
+				<br>
+				Overlay: <input type="range" id="overlay" min=0 max=1 step=0.1></input>
+
+				<br><br>
+
+				Statistics:<br>
+				<span class='monospace'>
+				iter/s: <span id="itps"></span><br>
+				score: <span id="score"></span><br>
+				№ of cubes: <span id="cubes"></span><br>
+				</span>
+
+				<span class='bottom'>
+
+				Target images:<br>
+				<button class="uibtn" id="load_monkey">Monkey</button>
+
+				</span>
+			</span>
+			<span id="surfaces"></span>
+		</span>
 		<script src='global_variables.js'></script>
 		<script src='matricies.js'></script>
 		<script src='common.js'></script>

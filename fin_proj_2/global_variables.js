@@ -2,6 +2,7 @@
 
 let currentFrame = 0;
 let CADStarted = false;
+let everythingLoaded = false;
 
 let surfaces = [];
 let activeSurface = null;
@@ -12,3 +13,9 @@ let scene = null; // read only, except by cad.js
 
 window.addEventListener('keydown', ev => isKeyPressed[ev.keyCode] = true);
 window.addEventListener('keyup',   ev => isKeyPressed[ev.keyCode] = false);
+
+const MIN_CUBE_SCALE = 0.05;
+const MAX_CUBE_SCALE = 0.3;
+
+const POSITION_SCALE = 1;
+const MAX_CUBE_COUNT = 50;

@@ -10,7 +10,7 @@ const initScene = () => {
 
 			//const color = [(x-count) / (2*count), 0.5, 0.5];
 			const height = (x === 0 && z === 0 ? 2 : 0.1);
-			const scale = [0.2, height, 0.2];
+			const scale = [MAX_CUBE_SCALE, height, MAX_CUBE_SCALE];
 			const rotation = [0, 0, 0];
 			const position = [x*2, scale[1]/2, z*2];
 
@@ -27,9 +27,9 @@ class Operation {
 	static TYPES = [
 		'ADD',
 		'REMOVE',
-		'CHANGE_COLOR',
-		'CHANGE_POSITION', 'CHANGE_POSITION',
-		'CHANGE_SCALE', 'CHANGE_SCALE'
+		'CHANGE_COLOR', 'CHANGE_COLOR',
+		'CHANGE_POSITION', 'CHANGE_POSITION', 'CHANGE_POSITION', 'CHANGE_POSITION',
+		'CHANGE_SCALE', 'CHANGE_SCALE', 'CHANGE_SCALE', 'CHANGE_SCALE',
 	];
 	//static TYPES = ['CHANGE_COLOR'];
 
@@ -38,17 +38,21 @@ class Operation {
 		//this.type = Operation.TYPES[Math.floor(Math.random() * Operation.TYPES.length)];
 		do {
 			this.type = Operation.TYPES[Math.floor(Math.random() * Operation.TYPES.length)];
-			bad = (scene.cubes.length >= 100 && this.type === 'ADD') || (scene.cubes.length === 0 && this.type !== 'ADD');
+			bad = (scene.cubes.length >= MAX_CUBE_COUNT && this.type === 'ADD') || (scene.cubes.length === 0 && this.type !== 'ADD');
 		} while(bad);
 		this.payload = null;
 	}
 	apply() {
 		if(this.type === 'ADD') {
 			const color = [r(), r(), r()];
-			const scale = [r()*0.2, r()*0.2, r()*0.2];
+			const scale = [
+				map(r(), MIN_CUBE_SCALE, MAX_CUBE_SCALE),
+				map(r(), MIN_CUBE_SCALE, MAX_CUBE_SCALE),
+				map(r(), MIN_CUBE_SCALE, MAX_CUBE_SCALE)
+			];
 			const rotation = [0,0,0];
 			//const rotation = [R(360), R(360), R(360)];
-			const position = [R(1), r()*2, R(1)];
+			const position = [R(POSITION_SCALE), R(POSITION_SCALE), R(POSITION_SCALE)];
 			this.payload = new Cube(color, scale, rotation, position);
 			scene.cubes.push(this.payload);
 		}
@@ -66,11 +70,12 @@ class Operation {
 		}
 		if(this.type === 'CHANGE_POSITION') {
 			const idx = Math.floor(Math.random() * scene.cubes.length);
-			const diff = [R(0.2), R(0.2), R(0.2)];
+			const asd = Math.random() > 0.5 ? 0.01 : 0.5;
+			const diff = [R(POSITION_SCALE * asd), R(POSITION_SCALE * asd), R(POSITION_SCALE * asd)];
 			this.payload = {idx: idx, diff: diff};
 
-			const MIN = -0.5;
-			const MAX = 0.5;
+			const MIN = -POSITION_SCALE;
+			const MAX = POSITION_SCALE;
 			for(let i = 0;i < 3;i ++) {
 				if(scene.cubes[idx].position[i] + diff[i] < MIN) {
 					diff[i] = MIN - scene.cubes[idx].position[i];
@@ -88,8 +93,8 @@ class Operation {
 			const diff = [R(0.2), R(0.2), R(0.2)];
 			this.payload = {idx: idx, diff: diff};
 
-			const MIN = 0.05;
-			const MAX = 0.5;
+			const MIN = MIN_CUBE_SCALE;
+			const MAX = MAX_CUBE_SCALE;
 			for(let i = 0;i < 3;i ++) {
 				if(scene.cubes[idx].scale[i] + diff[i] < MIN) {
 					diff[i] = MIN - scene.cubes[idx].scale[i];
@@ -142,10 +147,12 @@ const iterateBeforeRender = () => {
 	lastOp.apply();
 }
 
-let count = 0;
+let iterationsCount = 0, successCount = 0;
 let lastPrint = new Date();
 const iterateAfterRender = () => {
-	let total = 0;
+	iterationsCount ++;
+
+	let total = scene.cubes.length * 1000;
 	for(const surf of surfaces) {
 		total += surf.calcScore()
 	}
@@ -153,15 +160,20 @@ const iterateAfterRender = () => {
 	if(total >= bestScore) {
 		lastOp.revert();
 	} else {
+		successCount ++;
 		bestScore = total;
-		console.log('best score:', bestScore, 'cubes:', scene.cubes.length);
 	}
 
-	count ++;
 	let now = new Date();
-	if(now - lastPrint > 1000) {
-		console.log('iterations per sec:', count / ((now-lastPrint) / 1000));
-		count = 0;
+	if(now - lastPrint > 500) {
+		//console.log('best score:', bestScore, 'cubes:', scene.cubes.length);
+		console.log('successfull changes:', successCount);
+		const itps = iterationsCount / ((now-lastPrint) / 500);
+		document.getElementById('itps').innerText = itps.toFixed(2);
+		document.getElementById('score').innerText = bestScore;
+		document.getElementById('cubes').innerText = scene.cubes.length;
+		iterationsCount = 0;
+		successCount = 0;
 		lastPrint = now;
 	}
 }
