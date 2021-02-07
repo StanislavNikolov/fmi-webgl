@@ -150,8 +150,8 @@ class Surface {
 
 	calcScore() {
 		let total = 0;
-		for(let y = 0;y < this.compare.h;y ++) {
-			for(let x = 0;x < this.compare.w;x ++) {
+		for(let y = 0;y < this.compare.h;y += 3) {
+			for(let x = 0;x < this.compare.w;x += 3) {
 				const tid = (y * this.compare.w + x) * 4;
 				const t_r = this.tpixels.data[tid+0];
 				const t_g = this.tpixels.data[tid+1];

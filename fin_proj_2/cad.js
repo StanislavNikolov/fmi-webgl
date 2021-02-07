@@ -1,6 +1,6 @@
 const initScene = () => {
 	let cubes = [];
-	let count = 5;
+	let count = 1;
 	for(let x = -count;x <= count;x ++) {
 		for(let z = -count;z <= count;z ++) {
 			const color = [r(), r(), r()];
@@ -21,20 +21,34 @@ const initScene = () => {
 	return cubes;
 }
 scene = new Scene();
-scene.cubes.push(...initScene());
+//scene.cubes.push(...initScene());
 
 class Operation {
-	static TYPES = ['ADD', 'REMOVE'];
+	static TYPES = [
+		'ADD',
+		'REMOVE',
+		'CHANGE_COLOR',
+		'CHANGE_POSITION', 'CHANGE_POSITION',
+		'CHANGE_SCALE', 'CHANGE_SCALE'
+	];
+	//static TYPES = ['CHANGE_COLOR'];
+
 	constructor() {
-		this.type = Operation.TYPES[Math.floor(Math.random() * Operation.TYPES.length)];
+		let bad = false;
+		//this.type = Operation.TYPES[Math.floor(Math.random() * Operation.TYPES.length)];
+		do {
+			this.type = Operation.TYPES[Math.floor(Math.random() * Operation.TYPES.length)];
+			bad = (scene.cubes.length >= 100 && this.type === 'ADD') || (scene.cubes.length === 0 && this.type !== 'ADD');
+		} while(bad);
 		this.payload = null;
 	}
 	apply() {
 		if(this.type === 'ADD') {
 			const color = [r(), r(), r()];
-			const scale = [r()*2, r()*2, r()*2];
-			const rotation = [R(360), R(360), R(360)];
-			const position = [R(2), R(2), R(2)];
+			const scale = [r()*0.2, r()*0.2, r()*0.2];
+			const rotation = [0,0,0];
+			//const rotation = [R(360), R(360), R(360)];
+			const position = [R(1), r()*2, R(1)];
 			this.payload = new Cube(color, scale, rotation, position);
 			scene.cubes.push(this.payload);
 		}
@@ -42,12 +56,52 @@ class Operation {
 			const idx = Math.floor(Math.random() * scene.cubes.length);
 			this.payload = scene.cubes.splice(idx, 1)[0];
 		}
-		/*
-		if(this.type === 'CHANGE') {
+		if(this.type === 'CHANGE_COLOR') {
 			const idx = Math.floor(Math.random() * scene.cubes.length);
-			this.splice = 
+			const diff = [R(0.1), R(0.1), R(0.1)];
+			this.payload = {idx: idx, diff: diff};
+			scene.cubes[idx].color[0] += diff[0];
+			scene.cubes[idx].color[1] += diff[1];
+			scene.cubes[idx].color[2] += diff[2];
 		}
-		*/
+		if(this.type === 'CHANGE_POSITION') {
+			const idx = Math.floor(Math.random() * scene.cubes.length);
+			const diff = [R(0.2), R(0.2), R(0.2)];
+			this.payload = {idx: idx, diff: diff};
+
+			const MIN = -0.5;
+			const MAX = 0.5;
+			for(let i = 0;i < 3;i ++) {
+				if(scene.cubes[idx].position[i] + diff[i] < MIN) {
+					diff[i] = MIN - scene.cubes[idx].position[i];
+				}
+				if(scene.cubes[idx].position[i] + diff[i] > MAX) {
+					diff[i] = MAX - scene.cubes[idx].position[i];
+				}
+				scene.cubes[idx].position[i] += diff[i];
+			}
+
+			scene.cubes[idx].recalc();
+		}
+		if(this.type === 'CHANGE_SCALE') {
+			const idx = Math.floor(Math.random() * scene.cubes.length);
+			const diff = [R(0.2), R(0.2), R(0.2)];
+			this.payload = {idx: idx, diff: diff};
+
+			const MIN = 0.05;
+			const MAX = 0.5;
+			for(let i = 0;i < 3;i ++) {
+				if(scene.cubes[idx].scale[i] + diff[i] < MIN) {
+					diff[i] = MIN - scene.cubes[idx].scale[i];
+				}
+				if(scene.cubes[idx].scale[i] + diff[i] > MAX) {
+					diff[i] = MAX - scene.cubes[idx].scale[i];
+				}
+				scene.cubes[idx].scale[i] += diff[i];
+			}
+
+			scene.cubes[idx].recalc();
+		}
 	}
 	revert() {
 		if(this.type === 'ADD') {
@@ -55,6 +109,28 @@ class Operation {
 		}
 		if(this.type === 'REMOVE') {
 			scene.cubes.push(this.payload);
+		}
+		if(this.type === 'CHANGE_COLOR') {
+			const {idx, diff} = this.payload;
+			scene.cubes[idx].color[0] -= diff[0];
+			scene.cubes[idx].color[1] -= diff[1];
+			scene.cubes[idx].color[2] -= diff[2];
+		}
+		if(this.type === 'CHANGE_POSITION') {
+			const {idx, diff} = this.payload;
+
+			scene.cubes[idx].position[0] -= diff[0];
+			scene.cubes[idx].position[1] -= diff[1];
+			scene.cubes[idx].position[2] -= diff[2];
+			scene.cubes[idx].recalc();
+		}
+		if(this.type === 'CHANGE_SCALE') {
+			const {idx, diff} = this.payload;
+
+			scene.cubes[idx].scale[0] -= diff[0];
+			scene.cubes[idx].scale[1] -= diff[1];
+			scene.cubes[idx].scale[2] -= diff[2];
+			scene.cubes[idx].recalc();
 		}
 	}
 }
@@ -66,15 +142,26 @@ const iterateBeforeRender = () => {
 	lastOp.apply();
 }
 
+let count = 0;
+let lastPrint = new Date();
 const iterateAfterRender = () => {
 	let total = 0;
 	for(const surf of surfaces) {
 		total += surf.calcScore()
 	}
 
-	if(total > bestScore) {
+	if(total >= bestScore) {
 		lastOp.revert();
 	} else {
 		bestScore = total;
+		console.log('best score:', bestScore, 'cubes:', scene.cubes.length);
+	}
+
+	count ++;
+	let now = new Date();
+	if(now - lastPrint > 1000) {
+		console.log('iterations per sec:', count / ((now-lastPrint) / 1000));
+		count = 0;
+		lastPrint = now;
 	}
 }

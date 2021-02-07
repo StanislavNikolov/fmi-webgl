@@ -59,19 +59,23 @@ const canonicalCubeVertexData = (()=>{
 })();
 
 class Cube {
-	constructor(color, scale, direction, position) {
-		this.matrix = new Matrix4();
-		this.matrix.scalei(scale[0], scale[1], scale[2]);
-		this.matrix.rotateXi(direction[0]);
-		this.matrix.rotateYi(direction[1]);
-		this.matrix.rotateZi(direction[2]);
-		this.matrix.translatei(position[0], position[1], position[2]);
-
+	constructor(color, scale, rotation, position) {
+		this.scale = scale;
+		this.rotation = rotation
+		this.position = position;
 		this.color = color;
 
-		// TODO bad code design. Users of this class must remember to update f_matrixData if matrix is changed
-		this.f_matrixData = new Float32Array(this.matrix.data);
-		this.f_color = new Float32Array(this.color);
+		this.f_matrixData = null;
+		this.recalc();
+	}
+	recalc() {
+		const mat = new Matrix4();
+		mat.scalei(this.scale[0], this.scale[1], this.scale[2]);
+		mat.rotateXi(this.rotation[0]);
+		mat.rotateYi(this.rotation[1]);
+		mat.rotateZi(this.rotation[2]);
+		mat.translatei(this.position[0], this.position[1], this.position[2]);
+		this.f_matrixData = new Float32Array(mat.data);
 	}
 };
 
@@ -98,7 +102,7 @@ class Scene {
 		gl.vertexAttribPointer(vars.aNrm, 3, gl.FLOAT, false, 6 * FLOAT_SIZE, 3 * FLOAT_SIZE);
 		for(const cube of this.cubes) {
 			gl.uniformMatrix4fv(vars.uModelMatrix, false, cube.f_matrixData);
-			gl.uniform3fv(vars.uColor, cube.f_color);
+			gl.uniform3fv(vars.uColor, new Float32Array(cube.color));
 			gl.drawArrays(gl.TRIANGLES, 0, canonicalCubeVertexData.length / 6);
 		}
 
@@ -137,14 +141,11 @@ const render = (surface) => {
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 	// projection
-	const proj = new PerspectiveMatrix(30, 0.1, 4000, glcanvas.width/glcanvas.height);
+	const proj = new PerspectiveMatrix(40, 0.1, 4000, glcanvas.width/glcanvas.height);
 	gl.uniformMatrix4fv(vars.uProjMatrix, false, new Float32Array(proj.data));
 
 	// camera
-	const fr = 10 * 0.01;
-	const dist = 15;
 	const view = viewMatrix(
-		//[Math.cos(fr * 1.2) * dist, Math.sin(fr * 0.7) * dist, Math.sin(fr) * dist],
 		cam.pos,
 		[cam.pos[0] + cam.lookDir[0], cam.pos[1] + cam.lookDir[1], cam.pos[2] + cam.lookDir[2]],
 		[0, 1, 0]  // up
@@ -153,16 +154,19 @@ const render = (surface) => {
 
 	// add temporary cubes to denote the location of the other cameras
 	let tmpCubes = 0;
-	for(const surf of surfaces) {
-		if(surf === surface) continue;
-		const color = [0.6, 0.6, 0.2];
-		const scale = [0.2, 0.5, 0.2];
-		const rotation = [0, surf.cam.rotX / Math.PI * 180, 0];
-		scene.cubes.push(new Cube(color, scale, rotation, surf.cam.pos));
-		tmpCubes ++;
+	if(!CADStarted) {
+		for(const surf of surfaces) {
+			if(surf === surface) continue;
+			const color = [0.6, 0.6, 0.2];
+			const scale = [0.2, 0.5, 0.2];
+			const rotation = [0, surf.cam.rotX / Math.PI * 180, 0];
+			scene.cubes.push(new Cube(color, scale, rotation, surf.cam.pos));
+			tmpCubes ++;
+		}
 	}
 	scene.draw(surface);
 	for(let i = 0;i < tmpCubes;i ++) scene.cubes.pop();
+
 
 	/*                         IMPORTANT NOTE
 	 * https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/readPixels

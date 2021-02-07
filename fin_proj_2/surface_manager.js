@@ -1,7 +1,10 @@
 const renderWrapper = () => {
-	if(CADStarted) iterateBeforeRender();
+	for(let i = 0;i < 10;i ++) {
+		if(CADStarted) iterateBeforeRender();
+		for(const surf of surfaces) render(surf);
+		if(CADStarted) iterateAfterRender();
+	}
 	for(const surf of surfaces) render(surf);
-	if(CADStarted) iterateAfterRender();
 
 	currentFrame += 1;
 	window.requestAnimationFrame(renderWrapper);
@@ -68,13 +71,21 @@ window.addEventListener('load', () => {
 		targetImage.onload = () => {
 			loaded();
 		};
-		targetImage.src = `data/ready/cup_${i+1}_256.png`;
+		targetImage.src = `data/export/monkey_2/${i+1}.png`;
 		addSurface(targetImage);
 	}
-	surfaces[0].cam.pos = [ 10, 1,   0]; surfaces[0].cam.rotDX(-Math.PI/2);
-	surfaces[1].cam.pos = [  0, 1,  10];
-	surfaces[2].cam.pos = [-10, 1,   0]; surfaces[2].cam.rotDX(Math.PI/2);
-	surfaces[3].cam.pos = [0  , 1, -10]; surfaces[3].cam.rotDX(Math.PI);
+
+	const dist = 4;
+	const height = 0;
+	surfaces[0].cam.pos = [ dist, height,     0];
+	surfaces[1].cam.pos = [  0,   height, -dist];
+	surfaces[2].cam.pos = [-dist, height,     0];
+	surfaces[3].cam.pos = [0  ,   height,  dist];
+	surfaces[0].cam.rotDX(-Math.PI/2);
+	surfaces[1].cam.rotDX(Math.PI);
+	surfaces[2].cam.rotDX(Math.PI/2);
+
+	//for(const surf of surfaces) surf.cam.rotDY(0.4);
 
 	window.addEventListener('resize', () => {
 		for(const surf of surfaces) surf.rescale();
