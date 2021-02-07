@@ -70,8 +70,8 @@ class Operation {
 		}
 		if(this.type === 'CHANGE_POSITION') {
 			const idx = Math.floor(Math.random() * scene.cubes.length);
-			const asd = Math.random() > 0.5 ? 0.01 : 0.5;
-			const diff = [R(POSITION_SCALE * asd), R(POSITION_SCALE * asd), R(POSITION_SCALE * asd)];
+			const koef = Math.random() > 0.5 ? 0.01 : 0.8;
+			const diff = [R(POSITION_SCALE * koef), R(POSITION_SCALE * koef), R(POSITION_SCALE * koef)];
 			this.payload = {idx: idx, diff: diff};
 
 			const MIN = -POSITION_SCALE;
@@ -90,7 +90,8 @@ class Operation {
 		}
 		if(this.type === 'CHANGE_SCALE') {
 			const idx = Math.floor(Math.random() * scene.cubes.length);
-			const diff = [R(0.2), R(0.2), R(0.2)];
+			const koef = Math.random() > 0.5 ? 0.01 : 0.8;
+			const diff = [R(MAX_CUBE_SCALE*koef), R(MAX_CUBE_SCALE*koef), R(MAX_CUBE_SCALE*koef)];
 			this.payload = {idx: idx, diff: diff};
 
 			const MIN = MIN_CUBE_SCALE;

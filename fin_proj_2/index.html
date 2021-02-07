@@ -55,6 +55,7 @@
 				border-radius: 5px;
 				outline: none;
 				background-color: #efefef;
+				margin-bottom: 0.3em;
 			}
 			.uibtn:hover {
 				background-color: #cfcfcf;
@@ -64,8 +65,6 @@
 				padding: 0.5em;
 				font-weight: bold;
 			}
-			.uibtn .pref {
-			}
 			.green {
 				color: white;
 				background-color: #21ba45;
@@ -74,16 +73,20 @@
 				color: white;
 				background-color: #db2828;
 			}
+			#info {
+				font-size: small;
+			}
 		</style>
 
 		<span id="wrapper">
 			<span id="controls">
 				<center>
-				<button class="uibtn" id="btn_startpause" disabled> Start </button><br>
+				<button class="uibtn" id="btn_startpause" disabled> Start </button>
 				</center>
 
-				<br><br>
+				<br>
 
+				<!--
 				Preffered mutations:<br>
 				<button class="uibtn" id="pref_def" class='pref' disabled>Default</button>
 				<button class="uibtn" id="pref_add" class='pref'>Add</button>
@@ -92,6 +95,7 @@
 				<button class="uibtn" id="pref_mov" class='pref'>Move</button>
 				<button class="uibtn" id="pref_scl" class='pref'>Scale</button>
 				<br>
+				-->
 				Overlay: <input type="range" id="overlay" min=0 max=1 step=0.1></input>
 
 				<br><br>
@@ -103,11 +107,20 @@
 				№ of cubes: <span id="cubes"></span><br>
 				</span>
 
-				<span class='bottom'>
+				<br><br>
 
 				Target images:<br>
-				<button class="uibtn" id="load_monkey">Monkey</button>
+				<button class="uibtn" onclick="reload('monkey_2')">Monkey</button><br>
+				<button class="uibtn" onclick="reload('photo_cup_1')">Photo cup</button><br>
+				<button class="uibtn" onclick="reload('rendered_cup_3')">Rendered cup</button><br>
+				<button class="uibtn" onclick="reload('creepy_squid_1')">Creepy squid</button><br>
 
+				<br><br>
+
+				Info:<br>
+				<span id='info'>
+				Make the window smaller, until you get over 100 iterations per second. Click on any
+				of the panes to start walking around the world.
 				</span>
 			</span>
 			<span id="surfaces"></span>

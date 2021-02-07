@@ -47,6 +47,11 @@ const setOpacity = (opacity) => {
 	}
 }
 
+const reload = (dataset) => {
+	const url = document.URL.split('?');
+	window.location = url[0] + '?' + dataset;
+};
+
 const setCADState = (state) => {
 	const el = document.getElementById('btn_startpause')
 	if(state) {
@@ -81,10 +86,12 @@ window.addEventListener('load', () => {
 		}
 	};
 
+	const url = document.URL.split('?');
+	const dataset = (url.length > 1 ? url[1] : 'monkey_2');
 	for(let i = 0;i < 4;i ++) {
 		const targetImage = new Image();
 		targetImage.onload = loaded;
-		targetImage.src = `data/export/monkey_2/${i+1}.png`;
+		targetImage.src = `data/export/${dataset}/${i+1}.png`;
 		addSurface(targetImage);
 	}
 

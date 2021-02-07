@@ -17,5 +17,5 @@ window.addEventListener('keyup',   ev => isKeyPressed[ev.keyCode] = false);
 const MIN_CUBE_SCALE = 0.05;
 const MAX_CUBE_SCALE = 0.3;
 
-const POSITION_SCALE = 1;
-const MAX_CUBE_COUNT = 50;
+const POSITION_SCALE = 1.5;
+const MAX_CUBE_COUNT = 100;
